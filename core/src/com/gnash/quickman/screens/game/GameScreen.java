@@ -1,4 +1,4 @@
-package com.gnash.quickman.screens;
+package com.gnash.quickman.screens.game;
 
 import java.util.HashMap;
 
@@ -19,6 +19,7 @@ import com.gnash.quickman.entities.Ghost;
 import com.gnash.quickman.entities.GhostType;
 import com.gnash.quickman.entities.MoveDirection;
 import com.gnash.quickman.map.GameMap;
+import com.gnash.quickman.screens.highscore.HighScoreScreen;
 
 public class GameScreen implements Screen {
 	private static final float playerSpeed = 200;
@@ -31,80 +32,77 @@ public class GameScreen implements Screen {
 
 	private static final float PILL_DURATION = 10;
 
+	// currently unused layout
 	private int[][] defaultMapLayout2 = { { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 },
-			{ 3, 0, 1, 1, 1, 1, 1, 1, 1, 3 },
-			{ 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 3 },
-			{ 3, 1, 1, 1, 1, 1, 1, 1, 1, 3 },
-			{ 3, 1, 3, 2, 3, 3, 2, 3, 1, 3, 3 },
-			{ 3, 1, 3, 1, 3, 3, 1, 3, 1, 3 },
-			{ 3, 1, 3, 1, 1, 1, 1, 3, 1, 3, 3 },
-			{ 3, 1, 3, 3, 3, 3, 3, 3, 1, 3 },
-			{ 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 3 },
+			{ 3, 0, 1, 1, 1, 1, 1, 1, 1, 3 }, { 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 3 },
+			{ 3, 1, 1, 1, 1, 1, 1, 1, 1, 3 }, { 3, 1, 3, 2, 3, 3, 2, 3, 1, 3, 3 },
+			{ 3, 1, 3, 1, 3, 3, 1, 3, 1, 3 }, { 3, 1, 3, 1, 1, 1, 1, 3, 1, 3, 3 },
+			{ 3, 1, 3, 3, 3, 3, 3, 3, 1, 3 }, { 3, 1, 3, 3, 3, 3, 3, 3, 1, 3, 3 },
 			{ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 } };
 
 	private int[][] defaultMapLayout = {
-			{ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-					3, 3, 3, 3, 3, 3, 3 },
-			{ 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1,
-					1, 1, 1, 1, 1, 3, 3 },
-			{ 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1,
-					3, 3, 3, 3, 1, 3, 3 },
-			{ 3, 3, 2, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1,
-					3, 3, 3, 3, 2, 3, 3 },
-			{ 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1,
-					3, 3, 3, 3, 1, 3, 3 },
-			{ 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-					1, 1, 1, 1, 1, 3, 3 },
-			{ 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1,
-					3, 3, 3, 3, 1, 3, 3 },
-			{ 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1,
-					3, 3, 3, 3, 1, 3, 3 },
-			{ 3, 3, 1, 1, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 3, 1, 1, 1, 1, 3, 3, 1,
-					1, 1, 1, 1, 1, 3, 3 },
-			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1,
-					3, 3, 3, 3, 3, 3, 3 },
-			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1,
-					3, 3, 3, 3, 3, 3, 3 },
-			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 1,
-					3, 3, 3, 3, 3, 3, 3 },
-			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 4, 3, 3, 3, 1, 3, 3, 1,
-					3, 3, 3, 3, 3, 3, 3 },
-			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 0, 0, 0, 0, 0, 3, 1, 3, 3, 1,
-					3, 3, 3, 3, 3, 3, 3 },
-			{ 5, 1, 1, 1, 1, 1, 1, 1, 3, 3, 1, 3, 0, 0, 0, 0, 0, 3, 1, 3, 3, 1,
-					1, 1, 1, 1, 1, 1, 6 },
-			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 0, 0, 0, 0, 0, 3, 1, 3, 3, 1,
-					3, 3, 3, 3, 3, 3, 3 },
-			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1,
-					3, 3, 3, 3, 3, 3, 3 },
-			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 1,
-					3, 3, 3, 3, 3, 3, 3 },
-			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1,
-					3, 3, 3, 3, 3, 3, 3 },
-			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1,
-					3, 3, 3, 3, 3, 3, 3 },
-			{ 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1,
-					1, 1, 1, 1, 1, 3, 3 },
-			{ 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1,
-					3, 3, 3, 3, 1, 3, 3 },
-			{ 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1,
-					3, 3, 3, 3, 1, 3, 3 },
-			{ 3, 3, 2, 1, 1, 3, 3, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1,
-					3, 3, 1, 1, 2, 3, 3 },
-			{ 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1,
-					3, 3, 1, 3, 3, 3, 3 },
-			{ 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1,
-					3, 3, 1, 3, 3, 3, 3 },
-			{ 3, 3, 1, 1, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 3, 1, 1, 1, 1, 3, 3, 1,
-					1, 1, 1, 1, 1, 3, 3 },
-			{ 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 3,
-					3, 3, 3, 3, 1, 3, 3 },
-			{ 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 3,
-					3, 3, 3, 3, 1, 3, 3 },
-			{ 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-					1, 1, 1, 1, 1, 3, 3 },
-			{ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-					3, 3, 3, 3, 3, 3, 3 } };
+			{ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+					3, 3, 3, 3, 3 },
+			{ 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+					1, 1, 1, 3, 3 },
+			{ 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1, 3, 3,
+					3, 3, 1, 3, 3 },
+			{ 3, 3, 2, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1, 3, 3,
+					3, 3, 2, 3, 3 },
+			{ 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1, 3, 3,
+					3, 3, 1, 3, 3 },
+			{ 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+					1, 1, 1, 3, 3 },
+			{ 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3,
+					3, 3, 1, 3, 3 },
+			{ 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3,
+					3, 3, 1, 3, 3 },
+			{ 3, 3, 1, 1, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 3, 1, 1, 1, 1, 3, 3, 1, 1, 1,
+					1, 1, 1, 3, 3 },
+			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1, 3, 3,
+					3, 3, 3, 3, 3 },
+			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1, 3, 3,
+					3, 3, 3, 3, 3 },
+			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 1, 3, 3,
+					3, 3, 3, 3, 3 },
+			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 4, 3, 3, 3, 1, 3, 3, 1, 3, 3,
+					3, 3, 3, 3, 3 },
+			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 0, 0, 0, 0, 0, 3, 1, 3, 3, 1, 3, 3,
+					3, 3, 3, 3, 3 },
+			{ 5, 1, 1, 1, 1, 1, 1, 1, 3, 3, 1, 3, 0, 0, 0, 0, 0, 3, 1, 3, 3, 1, 1, 1,
+					1, 1, 1, 1, 6 },
+			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 0, 0, 0, 0, 0, 3, 1, 3, 3, 1, 3, 3,
+					3, 3, 3, 3, 3 },
+			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3,
+					3, 3, 3, 3, 3 },
+			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 1, 3, 3,
+					3, 3, 3, 3, 3 },
+			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3,
+					3, 3, 3, 3, 3 },
+			{ 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3,
+					3, 3, 3, 3, 3 },
+			{ 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+					1, 1, 1, 3, 3 },
+			{ 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1, 3, 3,
+					3, 3, 1, 3, 3 },
+			{ 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 1, 3, 3,
+					3, 3, 1, 3, 3 },
+			{ 3, 3, 2, 1, 1, 3, 3, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 3, 3,
+					1, 1, 2, 3, 3 },
+			{ 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3,
+					1, 3, 3, 3, 3 },
+			{ 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3,
+					1, 3, 3, 3, 3 },
+			{ 3, 3, 1, 1, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 3, 1, 1, 1, 1, 3, 3, 1, 1, 1,
+					1, 1, 1, 3, 3 },
+			{ 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3,
+					3, 3, 1, 3, 3 },
+			{ 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3,
+					3, 3, 1, 3, 3 },
+			{ 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+					1, 1, 1, 3, 3 },
+			{ 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+					3, 3, 3, 3, 3 } };
 
 	private QuickMain game;
 	public GameMap map;
@@ -236,23 +234,31 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
+		initializeRenderingProcess();
+		if (!playerDead && countdown <= 0) {
+			updateGameLogic(delta);
+		}
+		drawGame();
+	}
+
+	private void updateGameLogic(float delta) {
+		updateFrightTimer(delta);
+		updatePlayerTexture(playerLastMovement);
+		handlePlayerMovement(delta);
+		for (Ghost g : ghosts) {
+			g.update(delta);
+		}
+		checkForCollisions();
+	}
+
+	private void initializeRenderingProcess() {
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		// tell the camera to update its matrices.
 		camera.update();
-		// tell the SpriteBatch to render in the
-		// coordinate system specified by the camera.
 		batch.setProjectionMatrix(camera.combined);
-		// batch.draw(playerImage, 150, 150);
-		if (!playerDead && countdown <= 0) {
-			updateFrightTimer(delta);
-			updatePlayerTexture(playerLastMovement);
-			handlePlayerMovement(delta);
-			for (Ghost g : ghosts) {
-				g.update(delta);
-			}
-			checkForCollisions();
-		}
+	}
+
+	private void drawGame() {
 		map.render();
 		batch.begin();
 		drawPoints();
@@ -262,19 +268,21 @@ public class GameScreen implements Screen {
 			batch.draw(g.getTexture(), g.rect.x, g.rect.y, g.rect.width,
 					g.rect.height);
 		}
+		drawCountdownIfNecessary();
+		batch.end();
+	}
+
+	private void drawCountdownIfNecessary() {
 		if (countdown == 4) {
-			game.font.draw(batch, "Level " + level,
-					camera.viewportWidth / 2 - 90,
+			game.font.draw(batch, "Level " + level, camera.viewportWidth / 2 - 90,
 					camera.viewportHeight / 2 + 20);
 		} else if (countdown > 0) {
 			game.font.draw(batch, String.valueOf(countdown),
-					camera.viewportWidth / 2 - 10,
-					camera.viewportHeight / 2 + 20);
+					camera.viewportWidth / 2 - 10, camera.viewportHeight / 2 + 20);
 		} else if (countdown == 0) {
 			game.font.draw(batch, "GO!", camera.viewportWidth / 2 - 35,
 					camera.viewportHeight / 2 + 20);
 		}
-		batch.end();
 	}
 
 	private void updateFrightTimer(float delta) {
@@ -315,24 +323,28 @@ public class GameScreen implements Screen {
 				} else {
 					deathSound.play();
 					playerDead = true;
-					Timer.schedule(new Task() {
-
-						@Override
-						public void run() {
-							playerDead = false;
-							lives--;
-							if (lives > 0) {
-								resetCharacters();
-							} else {
-								game.setScreen(new HighScoreScreen(game, points));
-								dispose();
-							}
-						}
-
-					}, 1.5f);
+					startRespawnTimer();
 				}
 			}
 		}
+	}
+
+	private void startRespawnTimer() {
+		Timer.schedule(new Task() {
+
+			@Override
+			public void run() {
+				playerDead = false;
+				lives--;
+				if (lives > 0) {
+					resetCharacters();
+				} else {
+					game.setScreen(new HighScoreScreen(game, points));
+					dispose();
+				}
+			}
+
+		}, 1.5f);
 	}
 
 	private void drawPoints() {
@@ -343,65 +355,17 @@ public class GameScreen implements Screen {
 		if (isPlayerMoving()) {
 			FoodType food = FoodType.NONE;
 			switch (playerMovement) {
+			case UP:
+				food = handlePlayerMovementUp(delta);
+				break;
 			case DOWN:
-				player.y -= playerSpeed * delta;
-				if (player.y <= playerTargetY) {
-					player.y = playerTargetY;
-					food = map.enterTile(player.x, player.y);
-					playerMovement = MoveDirection.NONE;
-					if (!map.isBlocked(nextMovement, player.x, player.y)) {
-						movePlayer(nextMovement);
-					} else {
-						moveDown();
-					}
-				}
+				food = handlePlayerMovementDown(delta);
 				break;
 			case LEFT:
-				player.x -= playerSpeed * delta;
-				if (player.x <= playerTargetX) {
-					player.x = playerTargetX;
-					food = map.enterTile(player.x, player.y);
-					playerMovement = MoveDirection.NONE;
-					if (food == FoodType.TP_LEFT) {
-						player.x = map.playerTile.x * map.TILE_WIDTH;
-						player.y = map.playerTile.y * map.TILE_HEIGHT;
-						moveLeft();
-					} else if (!map.isBlocked(nextMovement, player.x, player.y)) {
-						movePlayer(nextMovement);
-					} else {
-						moveLeft();
-					}
-				}
+				food = handlePlayerMovementLeft(delta);
 				break;
 			case RIGHT:
-				player.x += playerSpeed * delta;
-				if (player.x >= playerTargetX) {
-					player.x = playerTargetX;
-					food = map.enterTile(player.x, player.y);
-					playerMovement = MoveDirection.NONE;
-					if (food == FoodType.TP_RIGHT) {
-						player.x = map.playerTile.x * map.TILE_WIDTH;
-						player.y = map.playerTile.y * map.TILE_HEIGHT;
-						moveRight();
-					} else if (!map.isBlocked(nextMovement, player.x, player.y)) {
-						movePlayer(nextMovement);
-					} else {
-						moveRight();
-					}
-				}
-				break;
-			case UP:
-				player.y += playerSpeed * delta;
-				if (player.y >= playerTargetY) {
-					player.y = playerTargetY;
-					food = map.enterTile(player.x, player.y);
-					playerMovement = MoveDirection.NONE;
-					if (!map.isBlocked(nextMovement, player.x, player.y)) {
-						movePlayer(nextMovement);
-					} else {
-						moveUp();
-					}
-				}
+				food = handlePlayerMovementRight(delta);
 				break;
 			case NONE:
 				break;
@@ -412,11 +376,82 @@ public class GameScreen implements Screen {
 		}
 	}
 
+	private FoodType handlePlayerMovementUp(float delta) {
+		FoodType food = FoodType.NONE;
+		player.y += playerSpeed * delta;
+		if (player.y >= playerTargetY) {
+			player.y = playerTargetY;
+			food = map.enterTile(player.x, player.y);
+			playerMovement = MoveDirection.NONE;
+			if (!map.isBlocked(nextMovement, player.x, player.y)) {
+				movePlayer(nextMovement);
+			} else {
+				movePlayerUpOneTile();
+			}
+		}
+		return food;
+	}
+
+	private FoodType handlePlayerMovementDown(float delta) {
+		FoodType food = FoodType.NONE;
+		player.y -= playerSpeed * delta;
+		if (player.y <= playerTargetY) {
+			player.y = playerTargetY;
+			food = map.enterTile(player.x, player.y);
+			playerMovement = MoveDirection.NONE;
+			if (!map.isBlocked(nextMovement, player.x, player.y)) {
+				movePlayer(nextMovement);
+			} else {
+				movePlayerDownOneTile();
+			}
+		}
+		return food;
+	}
+
+	private FoodType handlePlayerMovementLeft(float delta) {
+		FoodType food = FoodType.NONE;
+		player.x -= playerSpeed * delta;
+		if (player.x <= playerTargetX) {
+			player.x = playerTargetX;
+			food = map.enterTile(player.x, player.y);
+			playerMovement = MoveDirection.NONE;
+			if (food == FoodType.TP_LEFT) {
+				player.x = map.playerTile.x * map.TILE_WIDTH;
+				player.y = map.playerTile.y * map.TILE_HEIGHT;
+				movePlayerLeftOneTile();
+			} else if (!map.isBlocked(nextMovement, player.x, player.y)) {
+				movePlayer(nextMovement);
+			} else {
+				movePlayerLeftOneTile();
+			}
+		}
+		return food;
+	}
+
+	private FoodType handlePlayerMovementRight(float delta) {
+		FoodType food = FoodType.NONE;
+		player.x += playerSpeed * delta;
+		if (player.x >= playerTargetX) {
+			player.x = playerTargetX;
+			food = map.enterTile(player.x, player.y);
+			playerMovement = MoveDirection.NONE;
+			if (food == FoodType.TP_RIGHT) {
+				player.x = map.playerTile.x * map.TILE_WIDTH;
+				player.y = map.playerTile.y * map.TILE_HEIGHT;
+				movePlayerRightOneTile();
+			} else if (!map.isBlocked(nextMovement, player.x, player.y)) {
+				movePlayer(nextMovement);
+			} else {
+				movePlayerRightOneTile();
+			}
+		}
+		return food;
+	}
+
 	private void scareGhosts() {
 		frightTimer = PILL_DURATION;
 		for (Ghost g : ghosts) {
-			g.scared = true;
-			g.speed = Ghost.SCARED_SPEED;
+			g.scare();
 		}
 
 	}
@@ -424,18 +459,18 @@ public class GameScreen implements Screen {
 	private void movePlayer(MoveDirection dir) {
 		switch (dir) {
 		case DOWN:
-			moveDown();
+			movePlayerDownOneTile();
 			break;
 		case LEFT:
-			moveLeft();
+			movePlayerLeftOneTile();
 			break;
 		case NONE:
 			break;
 		case RIGHT:
-			moveRight();
+			movePlayerRightOneTile();
 			break;
 		case UP:
-			moveUp();
+			movePlayerUpOneTile();
 			break;
 		default:
 			break;
@@ -509,10 +544,8 @@ public class GameScreen implements Screen {
 		return playerMovement != MoveDirection.NONE;
 	}
 
-	public boolean moveLeft() {
-		if (/*
-			 * player.x > 0 &&
-			 */!map.getTileByPixel(player.x - 1, player.y).isBlocked()) {
+	public boolean movePlayerLeftOneTile() {
+		if (!map.getTileByPixel(player.x - 1, player.y).isBlocked()) {
 			playerMovement = MoveDirection.LEFT;
 			playerLastMovement = playerMovement;
 			playerTargetX = player.x - map.TILE_WIDTH;
@@ -522,10 +555,9 @@ public class GameScreen implements Screen {
 		return false;
 	}
 
-	public boolean moveRight() {
+	public boolean movePlayerRightOneTile() {
 		if (player.x <= map.getPixelWidth()
-				&& !map.getTileByPixel(player.x + map.TILE_WIDTH, player.y)
-						.isBlocked()) {
+				&& !map.getTileByPixel(player.x + map.TILE_WIDTH, player.y).isBlocked()) {
 			playerMovement = MoveDirection.RIGHT;
 			playerLastMovement = playerMovement;
 			playerTargetX = player.x + map.TILE_WIDTH;
@@ -535,9 +567,8 @@ public class GameScreen implements Screen {
 		return false;
 	}
 
-	public boolean moveDown() {
-		if (player.y > 0
-				&& !map.getTileByPixel(player.x, player.y - 1).isBlocked()) {
+	public boolean movePlayerDownOneTile() {
+		if (player.y > 0 && !map.getTileByPixel(player.x, player.y - 1).isBlocked()) {
 			playerMovement = MoveDirection.DOWN;
 			playerLastMovement = playerMovement;
 			playerTargetY = player.y - map.TILE_HEIGHT;
@@ -547,7 +578,7 @@ public class GameScreen implements Screen {
 		return false;
 	}
 
-	public boolean moveUp() {
+	public boolean movePlayerUpOneTile() {
 		if (player.x <= map.getPixelHeight()
 				&& !map.getTileByPixel(player.x, player.y + map.TILE_HEIGHT)
 						.isBlocked()) {

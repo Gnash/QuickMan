@@ -1,27 +1,30 @@
-package com.gnash.quickman.screens;
+package com.gnash.quickman.screens.highscore;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 
-public class MenuInputHandler implements InputProcessor {
+public class HighScoreInputHandler implements InputProcessor {
 
-	private MenuScreen menu;
+	private HighScoreScreen screen;
 
-	public MenuInputHandler(MenuScreen menu) {
-		this.menu = menu;
+	public HighScoreInputHandler(HighScoreScreen screen) {
+		this.screen = screen;
 	}
-	
+
 	@Override
 	public boolean keyDown(int keycode) {
-		switch (keycode) {
-		case Input.Keys.UP:
-				menu.up();			
-			return true;
-		case Input.Keys.DOWN:
-			menu.down();
-			return true;
-		case Input.Keys.ENTER:
-			menu.activateCurrentOption();
+		if (screen.enteringName) {
+			if (keycode == Input.Keys.ENTER) {
+				screen.finishEntering();
+				return true;
+			} else if (keycode == Input.Keys.BACKSPACE
+					&& screen.currentName.length() > 0) {
+				System.out.print(screen.currentName + ": ");
+				screen.currentName = screen.currentName.substring(0,
+						screen.currentName.length() - 1);
+			}
+		} else {
+			screen.goToMenu();
 			return true;
 		}
 		return false;
@@ -29,13 +32,15 @@ public class MenuInputHandler implements InputProcessor {
 
 	@Override
 	public boolean keyUp(int keycode) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean keyTyped(char character) {
-		// TODO Auto-generated method stub
+		if ((Character.isAlphabetic(character) || Character.isDigit(character))
+				&& screen.enteringName && screen.currentName.length() < 15) {
+			screen.currentName += character;
+		}
 		return false;
 	}
 

@@ -11,54 +11,54 @@ public class PinkyMover extends GhostMover {
 
 	@Override
 	public MoveDirection decideDirection() {
-		MapTile pTile = map.playerTile;
-		int x = pTile.x;
-		int y = pTile.y;
+		MapTile playerTile = map.playerTile;
+		int x = playerTile.x;
+		int y = playerTile.y;
+		MapTile targetTile = playerTile;
 		switch (map.screen.playerLastMovement) {
 		case DOWN:
 			y -= 4;
-			pTile = map.getTileByIndex(x, y);
-			while (pTile == null || pTile.isBlocked()) {
+			targetTile = map.getTileByIndex(x, y);
+			while (targetTile == null || targetTile.isBlocked()) {
 				y++;
-				pTile = map.getTileByIndex(x, y);
+				targetTile = map.getTileByIndex(x, y);
 			}
 			break;
 		case LEFT:
 			x -= 4;
-			pTile = map.getTileByIndex(x, y);
-			while (pTile == null || pTile.isBlocked()) {
+			targetTile = map.getTileByIndex(x, y);
+			while (targetTile == null || targetTile.isBlocked()) {
 				x++;
-				pTile = map.getTileByIndex(x, y);
+				targetTile = map.getTileByIndex(x, y);
 			}
-			break;
-		case NONE:
 			break;
 		case RIGHT:
 			x += 4;
-			pTile = map.getTileByIndex(x, y);
-			while (pTile == null || pTile.isBlocked()) {
+			targetTile = map.getTileByIndex(x, y);
+			while (targetTile == null || targetTile.isBlocked()) {
 				x--;
-				pTile = map.getTileByIndex(x, y);
+				targetTile = map.getTileByIndex(x, y);
 			}
 			break;
 		case UP:
 			y += 4;
-			pTile = map.getTileByIndex(x, y);
-			while (pTile == null || pTile.isBlocked()) {
+			targetTile = map.getTileByIndex(x, y);
+			while (targetTile == null || targetTile.isBlocked()) {
 				y--;
-				pTile = map.getTileByIndex(x, y);
+				targetTile = map.getTileByIndex(x, y);
 			}
+			break;
+		case NONE:
 			break;
 		default:
 			break;
 		}
 		MoveDirection result = map.getNextStepTowardsTile(owner.currentTile,
-				pTile, owner.lastDirection);
+				targetTile, owner.lastDirection);
 		if (result == MoveDirection.NONE) {
 			result = owner.lastDirection;
 		}
 		move(result);
 		return result;
 	}
-
 }

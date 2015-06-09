@@ -1,4 +1,4 @@
-package com.gnash.quickman.screens;
+package com.gnash.quickman.screens.menu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gnash.quickman.QuickMain;
+import com.gnash.quickman.screens.game.GameScreen;
+import com.gnash.quickman.screens.highscore.HighScoreScreen;
 
 public class MenuScreen implements Screen {
 

@@ -1,4 +1,4 @@
-package com.gnash.quickman.screens;
+package com.gnash.quickman.screens.highscore;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gnash.quickman.QuickMain;
+import com.gnash.quickman.screens.menu.MenuScreen;
 
 public class HighScoreScreen implements Screen {
 

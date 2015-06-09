@@ -1,4 +1,4 @@
-package com.gnash.quickman.screens;
+package com.gnash.quickman.screens.highscore;
 
 public class HighScoreEntry {
 	public String name;

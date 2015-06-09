@@ -11,7 +11,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.gnash.quickman.FoodType;
 import com.gnash.quickman.entities.MoveDirection;
-import com.gnash.quickman.screens.GameScreen;
+import com.gnash.quickman.screens.game.GameScreen;
 
 public class GameMap {
 	public final int xStart;
@@ -175,90 +175,86 @@ public class GameMap {
 	}
 
 	public List<GraphPair> getAvailableNeighbors(MapTile tile) {
-		ArrayList<GraphPair> result = new ArrayList<GraphPair>();
+		List<GraphPair> availableNeighbors = new ArrayList<GraphPair>();
 		if (tile == null) {
-			return result;
+			return availableNeighbors;
 		}
 		int x = tile.x;
 		int y = tile.y;
+		addLeftNeighborIfAvailable(x, y, availableNeighbors);
+		addRightNeighborIfAvailable(x, y, availableNeighbors);
+		addUpperNeighborIfAvailable(x, y, availableNeighbors);
+		addBottomNeighborIfAvailable(x, y, availableNeighbors);
+		addTeleportNeighborsIfAvailable(tile, availableNeighbors);
+		return availableNeighbors;
+	}
+
+	private void addTeleportNeighborsIfAvailable(MapTile tile,
+			List<GraphPair> availableNeighbors) {
+		if (tile.type == TileType.TP_LEFT) {
+			availableNeighbors.add(new GraphPair(MoveDirection.LEFT, getTileByIndex(
+					rightTeleporter.x - 1, rightTeleporter.y)));
+		} else if (tile.type == TileType.TP_RIGHT) {
+			availableNeighbors.add(new GraphPair(MoveDirection.RIGHT, getTileByIndex(
+					leftTeleporter.x + 1, leftTeleporter.y)));
+		}
+	}
+
+	private void addLeftNeighborIfAvailable(int x, int y, List<GraphPair> result) {
 		MapTile left = getTileByIndex(x - 1, y);
-		MapTile right = getTileByIndex(x + 1, y);
-		MapTile up = getTileByIndex(x, y + 1);
-		MapTile down = getTileByIndex(x, y - 1);
 		if (left != null && !left.isBlockedForGhosts()) {
 			result.add(new GraphPair(MoveDirection.LEFT, left));
 		}
-		if (right != null && !right.isBlockedForGhosts()) {
-			result.add(new GraphPair(MoveDirection.RIGHT, right));
-		}
-		if (up != null && !up.isBlockedForGhosts()) {
-			result.add(new GraphPair(MoveDirection.UP, up));
-		}
-		if (down != null && !down.isBlockedForGhosts()) {
-			result.add(new GraphPair(MoveDirection.DOWN, down));
-		}
-		if (tile.type == TileType.TP_LEFT) {
-			result.add(new GraphPair(MoveDirection.LEFT, getTileByIndex(rightTeleporter.x - 1, rightTeleporter.y)));
-		} else if (tile.type == TileType.TP_RIGHT) {
-			result.add(new GraphPair(MoveDirection.RIGHT, getTileByIndex(leftTeleporter.x + 1, leftTeleporter.y)));
-						
-		}
-		return result;
 	}
 
-	public MoveDirection getNextStepTowardsTile(MapTile current,
-			MapTile target, MoveDirection lastDirection) {
+	private void addRightNeighborIfAvailable(int x, int y,
+			List<GraphPair> availableNeighbors) {
+		MapTile right = getTileByIndex(x + 1, y);
+		if (right != null && !right.isBlockedForGhosts()) {
+			availableNeighbors.add(new GraphPair(MoveDirection.RIGHT, right));
+		}
+	}
+
+	private void addUpperNeighborIfAvailable(int x, int y,
+			List<GraphPair> availableNeighbors) {
+		MapTile up = getTileByIndex(x, y + 1);
+		if (up != null && !up.isBlockedForGhosts()) {
+			availableNeighbors.add(new GraphPair(MoveDirection.UP, up));
+		}
+	}
+
+	private void addBottomNeighborIfAvailable(int x, int y,
+			List<GraphPair> availableNeighbors) {
+		MapTile down = getTileByIndex(x, y - 1);
+		if (down != null && !down.isBlockedForGhosts()) {
+			availableNeighbors.add(new GraphPair(MoveDirection.DOWN, down));
+		}
+	}
+
+	public MoveDirection getNextStepTowardsTile(MapTile current, MapTile target,
+			MoveDirection lastDirection) {
 		MoveDirection result = DFS(current, target, lastDirection);
 		return result;
 	}
 
-	private MoveDirection DFS(MapTile current, MapTile target,
+	private MoveDirection DFS(MapTile currentTile, MapTile targetTile,
 			MoveDirection lastDirection) {
 		Queue<GraphPair> queue = new LinkedList<GraphPair>();
-		List<MapTile> visited = new ArrayList<MapTile>();
-		GraphPair currentPair;
-		// if (current == target) {
-		// return MoveDirection.NONE;
-		// }
-		// visited.add(current);
-		for (GraphPair x : getAvailableNeighbors(current)) {
-			switch (lastDirection) {
-			case DOWN:
-				if (x.dir != MoveDirection.UP)
-					queue.add(x);
-				break;
-			case LEFT:
-				if (x.dir != MoveDirection.RIGHT)
-					queue.add(x);
-				break;
-			case NONE:
-				queue.add(x);
-				break;
-			case RIGHT:
-				if (x.dir != MoveDirection.LEFT)
-					queue.add(x);
-				break;
-			case UP:
-				if (x.dir != MoveDirection.DOWN)
-					queue.add(x);
-				break;
-			default:
-				break;
+		addReachableNeighborTilesToQueue(queue, currentTile, lastDirection);
+		return findDirectionOnPathTowardsTile(currentTile, targetTile, queue);
+	}
 
-			}
-		}
-		MapTile start = current;
+	private MoveDirection findDirectionOnPathTowardsTile(MapTile currentTile,
+			MapTile targetTile, Queue<GraphPair> queue) {
+		List<MapTile> visited = new ArrayList<MapTile>();
 		do {
-			currentPair = queue.poll();
-			if (currentPair == null) {
-				System.out.println(start + ", " + target);
-			}
-			current = currentPair.tile;
-			visited.add(current);
-			if (current == target) {
+			GraphPair currentPair = queue.poll();
+			currentTile = currentPair.tile;
+			visited.add(currentTile);
+			if (currentTile == targetTile) {
 				return currentPair.dir;
 			}
-			List<GraphPair> possibleTargets = getAvailableNeighbors(current);
+			List<GraphPair> possibleTargets = getAvailableNeighbors(currentTile);
 			for (GraphPair pair : possibleTargets) {
 				if (!visited.contains(pair.tile)) {
 					queue.add(new GraphPair(currentPair.dir, pair.tile));
@@ -266,5 +262,34 @@ public class GameMap {
 			}
 		} while (!queue.isEmpty());
 		return MoveDirection.NONE;
+	}
+
+	private void addReachableNeighborTilesToQueue(Queue<GraphPair> queue,
+			MapTile currentTile, MoveDirection lastDirection) {
+		for (GraphPair currentPair : getAvailableNeighbors(currentTile)) {
+			switch (lastDirection) {
+			case DOWN:
+				if (currentPair.dir != MoveDirection.UP)
+					queue.add(currentPair);
+				break;
+			case LEFT:
+				if (currentPair.dir != MoveDirection.RIGHT)
+					queue.add(currentPair);
+				break;
+			case NONE:
+				queue.add(currentPair);
+				break;
+			case RIGHT:
+				if (currentPair.dir != MoveDirection.LEFT)
+					queue.add(currentPair);
+				break;
+			case UP:
+				if (currentPair.dir != MoveDirection.DOWN)
+					queue.add(currentPair);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 }

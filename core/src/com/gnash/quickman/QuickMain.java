@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
-import com.gnash.quickman.screens.GameScreen;
-import com.gnash.quickman.screens.MenuScreen;
+import com.gnash.quickman.screens.game.GameScreen;
+import com.gnash.quickman.screens.menu.MenuScreen;
 
 public class QuickMain extends Game {
 	public SpriteBatch batch;
